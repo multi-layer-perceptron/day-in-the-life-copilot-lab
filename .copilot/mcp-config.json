@@ -3,31 +3,65 @@
     "context7": {
       "type": "local",
       "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp"],
-      "tools": ["*"]
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "tools": [
+        "*"
+      ]
     },
     "memory": {
       "type": "local",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-memory"],
-      "tools": ["*"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "tools": [
+        "*"
+      ]
     },
     "sequential-thinking": {
       "type": "local",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
-      "tools": ["*"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "tools": [
+        "*"
+      ]
     },
     "workiq": {
       "type": "local",
       "command": "npx",
-      "args": ["-y", "@microsoft/workiq", "mcp"],
-      "tools": ["*"]
+      "args": [
+        "-y",
+        "@microsoft/workiq",
+        "mcp"
+      ],
+      "tools": [
+        "*"
+      ]
     },
     "microsoft-learn": {
       "type": "http",
       "url": "https://learn.microsoft.com/api/mcp",
-      "tools": ["*"]
+      "tools": [
+        "*"
+      ]
+    },
+    "fetch": {
+      "type": "local",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-fetch"
+      ],
+      "tools": [
+        "*"
+      ]
     }
   }
 }
