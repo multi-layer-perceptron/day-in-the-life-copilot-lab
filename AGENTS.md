@@ -75,6 +75,7 @@ The .NET project models a university system with these entities:
 - Keep generated documentation and configuration changes scoped to the current lab task.
 - For Git operations, add files individually and do not use `git add .` or `git add -A`.
 - For ContosoUniversity data access, use `IRepository<T>` instead of direct `SchoolContext` access from controllers.
+- Put database query logic in repository implementations under `ContosoUniversity.Infrastructure`; controllers should call `IRepository<T>` and stay focused on request handling.
 
 ## Architecture Decisions
 
