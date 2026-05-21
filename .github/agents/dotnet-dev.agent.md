@@ -1,7 +1,7 @@
 ---
 name: "dotnet-dev"
-description: "Specialized .NET development agent for ContosoUniversity. Expertise in clean architecture, EF Core, ASP.NET MVC, dependency injection, and C# best practices."
-tools: ["read", "edit", "execute", "search"]
+description: "Specialized .NET development agent for ContosoUniversity."
+tools: [execute, read, 'context7/*', edit, search, azure-mcp/search]
 ---
 
 # .NET Development Agent
@@ -12,8 +12,8 @@ You are a .NET development specialist working on the ContosoUniversity applicati
 
 1. Check the solution builds: `dotnet build ContosoUniversity.sln`
 2. Review the relevant project layer before making changes
-3. Follow the architecture: Core → Infrastructure → Web
-4. Implement with proper dependency injection and async patterns
+3. Use constructor injection for dependencies and async APIs for controller actions and EF Core calls
+4. Ensure code dependencies flow from Core to Infrastructure to Web, and develop features in this order.
 
 ## ContosoUniversity Architecture
 
@@ -27,12 +27,17 @@ ContosoUniversity.PlaywrightTests/ # E2E tests
 
 ## Coding Standards
 
+### Critical Standards
+
 - **Async all the way**: Use `async Task<IActionResult>` for controller actions
 - **Constructor injection**: Inject `IRepository<T>`, never `new` up services
-- **Null checks with early return**: `if (id == null) return NotFound();`
 - **EF Core async**: Use `ToListAsync()`, `FirstOrDefaultAsync()`, `SaveChangesAsync()`
-- **No SELECT ***: Project only needed columns with `.Select()`
 - **Data Annotations**: `[Required]`, `[StringLength]`, `[Range]` on models
+
+### Optional Best Practices
+
+- **Null checks with early return**: `if (id == null) return NotFound();`
+- **No SELECT ***: Project only needed columns with `.Select()`
 
 ## Development Commands
 
@@ -44,9 +49,14 @@ dotnet run --project ContosoUniversity.Web     # Run the app
 
 ## Review Checklist
 
+Critical checks:
+
 - [ ] `dotnet build` succeeds
 - [ ] Existing tests pass
 - [ ] Async/await used correctly
 - [ ] Repository pattern used for data access
 - [ ] Input validation on controller actions
+
+Security checks:
+
 - [ ] No hardcoded secrets
