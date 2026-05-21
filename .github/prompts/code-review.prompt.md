@@ -1,6 +1,7 @@
 ---
 description: "Comprehensive security and quality review of uncommitted changes with severity categorization"
 agent: "agent"
+model: Claude Mythos Preview (gated research preview) (Supports Agent Mode) (aitk-foundry)
 ---
 
 # Code Review

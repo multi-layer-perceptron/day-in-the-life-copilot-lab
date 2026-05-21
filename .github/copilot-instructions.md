@@ -103,3 +103,10 @@ This repository contains a brownfield .NET web application (ContosoUniversity) u
 - **Patterns**: Repository pattern, dependency injection, Entity Framework Core.
 - **Testing**: xUnit for unit/integration tests, Playwright for E2E.
 - When performing code review, ignore files in the `reports/` directory.
+
+## ContosoUniversity Conventions
+
+- All controller actions must be async and return `Task<IActionResult>`.
+- Use the repository pattern via `IRepository<T>` — never access `SchoolContext` directly from controllers.
+- Student names are displayed as "LastName, FirstMidName" throughout the UI.
+- Course IDs are department-assigned integers (not auto-generated). Validate they are in the range 1000-9999.

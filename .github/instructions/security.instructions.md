@@ -1,4 +1,6 @@
 ---
+name: security
+description: Security instructions for all files in the repository.
 applyTo: "**/*"
 ---
 
