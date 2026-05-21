@@ -1,6 +1,6 @@
 ---
-description: "Generate xUnit tests for a ContosoUniversity class. Creates unit tests with Moq mocks following MethodName_Condition_ExpectedResult naming. Covers happy paths, edge cases, and error scenarios."
-mode: "agent"
+description: "Generate ContosoUniversity xUnit tests."
+agent: agent
 tools: ["read", "edit", "execute", "search"]
 ---
 
@@ -10,66 +10,25 @@ Generate comprehensive xUnit tests for a ContosoUniversity class.
 
 ## Instructions
 
-1. **Read the source file** specified by the user (or the currently open file)
+1. **Read the source file** specified by the user. If no file is specified, use the currently open file.
 2. **Identify all public methods** that need testing
 3. **Check existing test patterns** in `ContosoUniversity.Tests/`
-4. **Generate a test class** following the conventions below
-
-## Test File Location
-
-- Controller tests → `ContosoUniversity.Tests/Controllers/{Name}ControllerTests.cs`
-- Integration tests → `ContosoUniversity.Tests/Integration/{Name}IntegrationTests.cs`
-- Model/validation tests → `ContosoUniversity.Tests/Models/{Name}Tests.cs`
-
-## Required Structure
-
-```csharp
-using Moq;
-using Xunit;
-using Microsoft.AspNetCore.Mvc;
-using ContosoUniversity.Core.Models;
-using ContosoUniversity.Core.Interfaces;
-using ContosoUniversity.Web.Controllers;
-
-namespace ContosoUniversity.Tests.Controllers;
-
-public class {ClassName}Tests
-{
-    // Mock dependencies
-    private readonly Mock<IRepository<{Entity}>> _mockRepo;
-    private readonly {ClassName} _sut; // System Under Test
-
-    public {ClassName}Tests()
-    {
-        _mockRepo = new Mock<IRepository<{Entity}>>();
-        _sut = new {ClassName}(_mockRepo.Object);
-    }
-
-    // Tests follow...
-}
-```
+4. **First, generate the test class setup** with Moq mocks in the constructor
+5. **Then, add happy path tests** for expected successful behavior
+6. **Then, add null or missing input tests** where parameters can be absent
+7. **Then, add not found tests** for missing entities
+8. **Then, add validation failure tests** for invalid model state or invalid input
+9. **Finally, add error handling tests** for expected exception or failure paths
 
 ## Naming Convention
 
 Use `MethodName_Condition_ExpectedResult`:
-
 - `Index_WithStudents_ReturnsViewWithStudentList`
 - `Details_NullId_ReturnsNotFound`
 - `Create_ValidModel_RedirectsToIndex`
-- `Delete_NonExistentId_ReturnsNotFound`
-
-## Coverage Requirements
-
-For each public method, generate tests for:
-
-1. **Happy path** — expected input produces expected output
-2. **Null/missing input** — null parameters, missing required fields
-3. **Not found** — entity does not exist in database
-4. **Validation failure** — invalid model state
-5. **Error handling** — repository throws exception
 
 ## After Generating
 
-1. Verify the test file compiles: `dotnet build ContosoUniversity.Tests/`
-2. Run the tests: `dotnet test ContosoUniversity.Tests/ --filter "{ClassName}"` 
-3. Report results to the user
+1. Build: `dotnet build ContosoUniversity.Tests/`
+2. Run: `dotnet test ContosoUniversity.Tests/ --filter "{ClassName}"`
+3. Report results
