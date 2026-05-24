@@ -28,29 +28,41 @@ namespace ContosoUniversity.Web.Controllers
 
         // GET: Students
         [Authorize(Roles = "Admin,Teacher")]
-        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
+        public async Task<IActionResult> Index(
+            string? sortOrder,
+            string? currentLastNameFilter,
+            string? currentFirstNameFilter,
+            string? lastNameSearch,
+            string? firstNameSearch,
+            int? pageNumber)
         {
             ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
 
-            if (searchString != null)
+            if (lastNameSearch != null || firstNameSearch != null)
             {
                 pageNumber = 1;
             }
             else
             {
-                searchString = currentFilter;
+                lastNameSearch = currentLastNameFilter;
+                firstNameSearch = currentFirstNameFilter;
             }
 
-            ViewData["CurrentFilter"] = searchString;
+            ViewData["CurrentLastNameFilter"] = lastNameSearch;
+            ViewData["CurrentFirstNameFilter"] = firstNameSearch;
 
             var studentsQuery = _studentRepository.GetQueryable();
 
-            if (!String.IsNullOrEmpty(searchString))
+            if (!String.IsNullOrEmpty(lastNameSearch))
             {
-                studentsQuery = studentsQuery.Where(s => s.LastName.Contains(searchString)
-                                       || s.FirstMidName.Contains(searchString));
+                studentsQuery = studentsQuery.Where(s => s.LastName.Contains(lastNameSearch));
+            }
+
+            if (!String.IsNullOrEmpty(firstNameSearch))
+            {
+                studentsQuery = studentsQuery.Where(s => s.FirstMidName.Contains(firstNameSearch));
             }
 
             studentsQuery = sortOrder switch

@@ -11,12 +11,19 @@
 </p>
 
 <form asp-action="Index" method="get">
-    <div class="form-actions no-color">
-        <p>
-            Find by name: <input type="text" name="SearchString" value="@ViewBag.CurrentFilter" />
-            <input type="submit" value="Search" class="btn btn-default" /> |
-            <a asp-action="Index">Back to Full List</a>
-        </p>
+    <div class="row g-3 align-items-end mb-3">
+        <div class="col-md-4">
+            <label for="lastNameSearch" class="form-label">Last name</label>
+            <input id="lastNameSearch" type="text" name="lastNameSearch" value="@ViewBag.CurrentLastNameFilter" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label for="firstNameSearch" class="form-label">First name</label>
+            <input id="firstNameSearch" type="text" name="firstNameSearch" value="@ViewBag.CurrentFirstNameFilter" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <input type="submit" value="Search" class="btn btn-primary" />
+            <a asp-action="Index" class="btn btn-secondary">Back to Full List</a>
+        </div>
     </div>
 </form>
 
@@ -24,13 +31,19 @@
     <thead>
         <tr>
             <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewBag.NameSortParm" asp-route-currentFilter="@ViewBag.CurrentFilter">Last Name</a>
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewBag.NameSortParm"
+                   asp-route-currentLastNameFilter="@ViewBag.CurrentLastNameFilter"
+                   asp-route-currentFirstNameFilter="@ViewBag.CurrentFirstNameFilter">Last Name</a>
             </th>
             <th>
                 First Name
             </th>
             <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewBag.DateSortParm" asp-route-currentFilter="@ViewBag.CurrentFilter">Enrollment Date</a>
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewBag.DateSortParm"
+                   asp-route-currentLastNameFilter="@ViewBag.CurrentLastNameFilter"
+                   asp-route-currentFirstNameFilter="@ViewBag.CurrentFirstNameFilter">Enrollment Date</a>
             </th>
             <th>Actions</th>
         </tr>
@@ -62,16 +75,18 @@
 
 <a asp-action="Index" 
    asp-route-sortOrder="@ViewBag.CurrentSort" 
-   asp-route-page="@(Model.PageIndex - 1)" 
-   asp-route-currentFilter="@ViewBag.CurrentFilter" 
-   class="btn btn-default @(Model.HasPreviousPage ? "" : "disabled")">
+    asp-route-pageNumber="@(Model.PageIndex - 1)" 
+    asp-route-currentLastNameFilter="@ViewBag.CurrentLastNameFilter"
+    asp-route-currentFirstNameFilter="@ViewBag.CurrentFirstNameFilter"
+    class="btn btn-secondary @(Model.HasPreviousPage ? "" : "disabled")">
    Previous
 </a>
 
 <a asp-action="Index" 
    asp-route-sortOrder="@ViewBag.CurrentSort" 
-   asp-route-page="@(Model.PageIndex + 1)" 
-   asp-route-currentFilter="@ViewBag.CurrentFilter" 
-   class="btn btn-default @(Model.HasNextPage ? "" : "disabled")">
+    asp-route-pageNumber="@(Model.PageIndex + 1)" 
+    asp-route-currentLastNameFilter="@ViewBag.CurrentLastNameFilter"
+    asp-route-currentFirstNameFilter="@ViewBag.CurrentFirstNameFilter"
+    class="btn btn-secondary @(Model.HasNextPage ? "" : "disabled")">
    Next
 </a>

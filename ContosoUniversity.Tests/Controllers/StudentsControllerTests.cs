@@ -48,7 +48,7 @@ namespace ContosoUniversity.Tests.Controllers
                 .Returns(students.AsQueryable());
 
             // Act
-            var result = await _controller.Index("", "", "", 1);
+            var result = await _controller.Index("", "", "", "", "", 1);
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -63,16 +63,142 @@ namespace ContosoUniversity.Tests.Controllers
             var students = new List<Student>();
 
             _mockStudentRepository
-                .Setup(repo => repo.GetAllAsync())
-                .ReturnsAsync(students);
+                .Setup(repo => repo.GetQueryable())
+                .Returns(students.AsQueryable());
 
             // Act
-            var result = await _controller.Index("", "", "", 1);
+            var result = await _controller.Index("", "", "", "", "", 1);
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = Assert.IsAssignableFrom<PaginatedList<Student>>(viewResult.Model);
             Assert.Empty(model);
+        }
+
+        [Fact]
+        public async Task Index_WithLastNameSearch_ReturnsMatchingStudents()
+        {
+            // Arrange
+            var students = CreateSearchTestStudents();
+
+            _mockStudentRepository
+                .Setup(repo => repo.GetQueryable())
+                .Returns(students.AsQueryable());
+
+            // Act
+            var result = await _controller.Index("", "", "", "Alex", "", 1);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<PaginatedList<Student>>(viewResult.Model);
+            var student = Assert.Single(model);
+            Assert.Equal("Alexandria", student.LastName);
+            Assert.Equal("Alex", viewResult.ViewData["CurrentLastNameFilter"]);
+        }
+
+        [Fact]
+        public async Task Index_WithFirstNameSearch_ReturnsMatchingStudents()
+        {
+            // Arrange
+            var students = CreateSearchTestStudents();
+
+            _mockStudentRepository
+                .Setup(repo => repo.GetQueryable())
+                .Returns(students.AsQueryable());
+
+            // Act
+            var result = await _controller.Index("", "", "", "", "Alex", 1);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<PaginatedList<Student>>(viewResult.Model);
+            var student = Assert.Single(model);
+            Assert.Equal("Parker", student.LastName);
+            Assert.Equal("Alex", viewResult.ViewData["CurrentFirstNameFilter"]);
+        }
+
+        [Fact]
+        public async Task Index_WithFirstAndLastNameSearch_ReturnsStudentsMatchingBothFilters()
+        {
+            // Arrange
+            var students = CreateSearchTestStudents();
+
+            _mockStudentRepository
+                .Setup(repo => repo.GetQueryable())
+                .Returns(students.AsQueryable());
+
+            // Act
+            var result = await _controller.Index("", "", "", "Smith", "Jordan", 1);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<PaginatedList<Student>>(viewResult.Model);
+            var student = Assert.Single(model);
+            Assert.Equal("Smith", student.LastName);
+            Assert.Equal("Jordan", student.FirstMidName);
+        }
+
+        [Fact]
+        public async Task Index_WithCurrentFiltersAndSortOrder_PreservesFiltersAndSortsResults()
+        {
+            // Arrange
+            var students = CreateSearchTestStudents();
+
+            _mockStudentRepository
+                .Setup(repo => repo.GetQueryable())
+                .Returns(students.AsQueryable());
+
+            // Act
+            var result = await _controller.Index("date_desc", "Smith", "", null, null, 1);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<PaginatedList<Student>>(viewResult.Model);
+            Assert.Collection(
+                model,
+                student => Assert.Equal("Zoe", student.FirstMidName),
+                student => Assert.Equal("Jordan", student.FirstMidName));
+            Assert.Equal("Smith", viewResult.ViewData["CurrentLastNameFilter"]);
+        }
+
+        [Fact]
+        public async Task Index_WithCurrentFirstNameFilterAndSortOrder_PreservesFilterAndSortsResults()
+        {
+            // Arrange
+            var students = CreateSearchTestStudents();
+
+            _mockStudentRepository
+                .Setup(repo => repo.GetQueryable())
+                .Returns(students.AsQueryable());
+
+            // Act
+            var result = await _controller.Index("Date", "", "Alex", null, null, 1);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<PaginatedList<Student>>(viewResult.Model);
+            var student = Assert.Single(model);
+            Assert.Equal("Alex", student.FirstMidName);
+            Assert.Equal("Alex", viewResult.ViewData["CurrentFirstNameFilter"]);
+        }
+
+        [Fact]
+        public async Task Index_WithNewSearch_ResetsPageNumberToFirstPage()
+        {
+            // Arrange
+            var students = CreateSearchTestStudents();
+
+            _mockStudentRepository
+                .Setup(repo => repo.GetQueryable())
+                .Returns(students.AsQueryable());
+
+            // Act
+            var result = await _controller.Index("", "", "", "Smith", "", 2);
+
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<PaginatedList<Student>>(viewResult.Model);
+            Assert.Equal(1, model.PageIndex);
         }
 
         [Fact]
@@ -351,6 +477,17 @@ namespace ContosoUniversity.Tests.Controllers
             // _mockNotificationService.Verify(service => service.SendNotificationAsync(
             //     It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<EntityOperation>(), It.IsAny<string>()), 
             //     Times.Once);
+        }
+
+        private static List<Student> CreateSearchTestStudents()
+        {
+            return new List<Student>
+            {
+                new Student { ID = 1, FirstMidName = "Jordan", LastName = "Smith", EnrollmentDate = DateTime.Parse("2020-09-01") },
+                new Student { ID = 2, FirstMidName = "Alex", LastName = "Parker", EnrollmentDate = DateTime.Parse("2021-09-01") },
+                new Student { ID = 3, FirstMidName = "Taylor", LastName = "Alexandria", EnrollmentDate = DateTime.Parse("2022-09-01") },
+                new Student { ID = 4, FirstMidName = "Zoe", LastName = "Smith", EnrollmentDate = DateTime.Parse("2023-09-01") }
+            };
         }
     }
 }

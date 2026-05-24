@@ -69,6 +69,13 @@
         "powershell": "./scripts/hooks/post-tool-use-console-warn.ps1",
         "timeoutSec": 5,
         "comment": "Warn about console.log statements in edited files"
+      },
+      {
+        "type": "command",
+        "bash": "./scripts/hooks/post-tool-use-dotnet-build.sh",
+        "powershell": "./scripts/hooks/post-tool-use-dotnet-build.ps1",
+        "timeoutSec": 30,
+        "comment": "Verify .NET build after editing C# files"
       }
     ],
     "errorOccurred": [
