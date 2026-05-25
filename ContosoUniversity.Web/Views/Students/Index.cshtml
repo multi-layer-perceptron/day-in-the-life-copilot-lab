@@ -34,10 +34,7 @@
                 <a asp-action="Index"
                    asp-route-sortOrder="@ViewBag.NameSortParm"
                    asp-route-currentLastNameFilter="@ViewBag.CurrentLastNameFilter"
-                   asp-route-currentFirstNameFilter="@ViewBag.CurrentFirstNameFilter">Last Name</a>
-            </th>
-            <th>
-                First Name
+                   asp-route-currentFirstNameFilter="@ViewBag.CurrentFirstNameFilter">Full Name</a>
             </th>
             <th>
                 <a asp-action="Index"
@@ -53,10 +50,7 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.LastName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.FirstMidName)
+                    @item.FullName
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.EnrollmentDate)

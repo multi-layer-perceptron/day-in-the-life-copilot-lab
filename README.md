@@ -28,13 +28,13 @@ A comprehensive, hands-on lab teaching the **full GitHub Copilot agentic develop
 
 ### Permissions & Licensing
 
-Most labs (01–07, 10) work with **any Copilot license**. A few labs require specific plans or permissions:
+Most labs (01–07, 10–11) work with **any Copilot license**. A few labs require specific plans or permissions:
 
 | Lab | Feature | Required License | GitHub Permissions |
 |-----|---------|-----------------|-------------------|
 | **Lab 08** | GitHub Agentic Workflows (`gh-aw`) | Copilot Business or Enterprise | Actions enabled, `COPILOT_GITHUB_TOKEN` secret ([setup](labs/lab08.md#84-configure-the-copilot_github_token-secret)) |
 | **Lab 09** | Copilot Coding Agent + Code Review | Copilot Pro+, Business, or Enterprise | Repo admin (to configure rulesets + enable coding agent) |
-| All other labs | Agents, Skills, Instructions, Prompts, Hooks, MCP, Orchestration | Any Copilot license (Individual+) | Repo write access |
+| All other labs | Agents, Skills, Instructions, Prompts, Hooks, MCP, Orchestration, Git Worktrees | Any Copilot license (Individual+) | Repo write access |
 
 > **Note:** If your organization restricts Copilot features via policy, check with your admin that agent mode, MCP servers, and Copilot CLI are enabled.
 
@@ -393,6 +393,7 @@ Get-Content AGENTS.md
 - [ ] Lab 08: gh-aw: PRD Generation
 - [ ] Lab 09: Copilot Coding Agent & Code Review
 - [ ] Lab 10: Session Management & Memory
+- [ ] Lab 11: Parallel Copilot CLI Sessions with Git Worktrees
 ```
 
 ---
@@ -456,6 +457,7 @@ erDiagram
 | **Code Review** | AI-powered pull request reviews | 09 |
 | **Reindex** | Automatic semantic understanding of your codebase | 10 |
 | **Session Management** | Memory MCP for decisions, handoffs, continuous learning | 10 |
+| **Git Worktrees** | Parallel Copilot CLI sessions on isolated feature branches | 11 |
 
 ---
 
@@ -476,8 +478,99 @@ erDiagram
 | [Lab 08](labs/lab08.md) | gh-aw: PRD Generation | Branch creation triggers PM agent |
 | [Lab 09](labs/lab09.md) | Copilot Coding Agent & Code Review | Issue → Coding Agent → PR → AI review |
 | [Lab 10](labs/lab10.md) | Reindex, Session Management & Memory | Reindex, Memory MCP, continuous learning, handoffs |
+| [Lab 11](#lab-11--parallel-copilot-cli-sessions-with-git-worktrees) | Parallel Copilot CLI Sessions with Git Worktrees | Worktrees, feature branches, role-based parallel sessions |
 
-**Total: ~3 hours** (10 labs — self-paced or presenter-led)
+**Total: ~3.5 hours** (11 labs — self-paced or presenter-led)
+
+### Lab 11 — Parallel Copilot CLI Sessions with Git Worktrees
+
+Use Git worktrees to run multiple Copilot CLI sessions at the same time. Each session gets its own working directory and feature branch, which keeps implementation, testing, review, or documentation work isolated until you intentionally merge it.
+
+Example setup from the repository root:
+
+```bash
+git status --short
+git switch main
+git pull --ff-only
+
+mkdir -p ../copilot-worktrees
+
+git worktree add -b feature/student-search ../copilot-worktrees/student-search main
+git worktree add -b feature/student-search-tests ../copilot-worktrees/student-search-tests main
+git worktree add -b feature/agent-docs ../copilot-worktrees/agent-docs main
+
+git worktree list
+```
+
+Start one Copilot CLI session per worktree:
+
+```bash
+cd ../copilot-worktrees/student-search
+copilot
+```
+
+Prompt the first session:
+
+```text
+Act as dotnet-dev. Refactor student search so it supports filtering by last name or first name while preserving pagination and sorting.
+```
+
+Start a second session:
+
+```bash
+cd ../copilot-worktrees/student-search-tests
+copilot
+```
+
+Prompt the second session:
+
+```text
+Act as dotnet-qa. Add xUnit and Moq tests for student search behavior. Cover first-name filtering, last-name filtering, combined filters, sorting, and pagination reset.
+```
+
+Start a third session:
+
+```bash
+cd ../copilot-worktrees/agent-docs
+copilot
+```
+
+Prompt the third session:
+
+```text
+Act as code-reviewer. Review the student search changes for bugs, regressions, missing tests, and security issues.
+```
+
+When each branch is ready, validate and commit from its worktree:
+
+```bash
+dotnet build ContosoUniversity.sln
+dotnet test ContosoUniversity.Tests/ContosoUniversity.Tests.csproj
+git status --short
+git diff
+git add ContosoUniversity.Web/Controllers/StudentsController.cs
+git add ContosoUniversity.Web/Views/Students/Index.cshtml
+git commit -m "feat: support separate student name filters"
+```
+
+Bring the branches together in an integration branch:
+
+```bash
+cd /workspaces/day-in-the-life-copilot-lab
+git switch -c feature/student-search-integration
+git merge feature/student-search
+git merge feature/student-search-tests
+dotnet test ContosoUniversity.sln
+```
+
+Clean up merged worktrees when finished:
+
+```bash
+git worktree remove ../copilot-worktrees/student-search
+git branch -d feature/student-search
+```
+
+This pattern gives you lightweight orchestration with clear branch boundaries: one session can implement, another can test, and another can review or document without competing for the same checkout.
 
 ---
 
@@ -529,7 +622,7 @@ day-in-the-life-copilot-lab/
 ├── ContosoUniversity.Web/         # ASP.NET MVC web application
 ├── ContosoUniversity.Tests/       # xUnit unit and integration tests
 ├── ContosoUniversity.PlaywrightTests/ # Playwright E2E tests
-├── labs/                          # Hands-on lab modules (10 labs)
+├── labs/                          # Standalone hands-on lab files (Labs 01–10)
 ├── solutions/                     # Reference solutions for each lab
 ├── docs/                          # Research and reference documentation
 ├── scripts/hooks/                 # Hook shell scripts (Bash + PowerShell)
@@ -556,7 +649,7 @@ This lab uses [GitHub Agentic Workflows](https://github.com/github/gh-aw) (gh-aw
 | Resource | Description |
 |----------|-------------|
 | [Setup](#choose-your-path) | Fork, prerequisites, environment setup |
-| [Lab Modules](labs/) | 10 hands-on labs — start here |
+| [Lab Modules](#lab-modules) | 11 hands-on labs — start here |
 | [Reference Solutions](solutions/) | Completed solutions for each lab |
 | [Troubleshooting](TROUBLESHOOTING.md) | Common issues and fixes |
 | [AGENTS.md](AGENTS.md) | Full project context document |
