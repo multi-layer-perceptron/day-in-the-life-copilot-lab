@@ -1346,6 +1346,11 @@ jobs:
           mkdir -p /tmp/gh-aw/
           find "/tmp/gh-aw/" -type f -print
           echo "GH_AW_AGENT_OUTPUT=/tmp/gh-aw/agent_output.json" >> "$GITHUB_OUTPUT"
+      - name: Ensure workflow install note file exists
+        if: steps.download-agent-output.outcome == 'success'
+        run: |
+          mkdir -p "${RUNNER_TEMP}/gh-aw/md"
+          : > "${RUNNER_TEMP}/gh-aw/md/workflow_install_note.md"
       - name: Configure GH_HOST for enterprise compatibility
         id: ghes-host-config
         shell: bash
@@ -1381,4 +1386,3 @@ jobs:
             /tmp/gh-aw/safe-output-items.jsonl
             /tmp/gh-aw/temporary-id-map.json
           if-no-files-found: ignore
-
