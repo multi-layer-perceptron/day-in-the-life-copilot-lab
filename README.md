@@ -38,6 +38,8 @@ Most labs (01–07, 10–11) work with **any Copilot license**. A few labs requi
 
 > **Note:** If your organization restricts Copilot features via policy, check with your admin that agent mode, MCP servers, and Copilot CLI are enabled.
 
+> **Lab 08 auth caveat:** In Codespaces, `gh` may be authenticated with the built-in `GITHUB_TOKEN`. That integration token can read and write many repo resources, but it cannot always fetch the Actions secrets public key or create the `COPILOT_GITHUB_TOKEN` secret. If `gh aw add-wizard` reports `failed to fetch public key: HTTP 403: Resource not accessible by integration`, re-authenticate `gh` with your user account before setting the secret: `unset GITHUB_TOKEN && gh auth login --web`. Then verify access with `gh api repos/OWNER/REPO/actions/secrets/public-key --jq .key_id` and rerun the wizard.
+
 ---
 
 ## Choose Your Path
@@ -637,6 +639,8 @@ day-in-the-life-copilot-lab/
 
 This lab uses [GitHub Agentic Workflows](https://github.com/github/gh-aw) (gh-aw) — author GitHub Actions using Markdown with YAML frontmatter. Two workflows are included:
 
+For Lab 08, `gh-aw` needs to create or update the `COPILOT_GITHUB_TOKEN` repository secret. If you are in Codespaces and see `Resource not accessible by integration`, your GitHub CLI is probably using the Codespaces `GITHUB_TOKEN` instead of a user-authenticated token. Run `unset GITHUB_TOKEN`, authenticate with `gh auth login --web`, and retry the wizard.
+
 | Workflow | Trigger | What It Does |
 |----------|---------|-------------|
 | **PRD Generation** | Feature branch created | PM agent generates a Product Requirements Document |
@@ -661,6 +665,7 @@ This lab uses [GitHub Agentic Workflows](https://github.com/github/gh-aw) (gh-aw
 | Problem | Fix |
 |---------|-----|
 | Copilot CLI not authenticated | Run `gh auth login` and follow prompts |
+| `gh aw add-wizard` cannot set `COPILOT_GITHUB_TOKEN` | In Codespaces, run `unset GITHUB_TOKEN`, re-authenticate with `gh auth login --web`, verify `gh api repos/OWNER/REPO/actions/secrets/public-key --jq .key_id`, then rerun the wizard |
 | MCP servers not loading | Copy `.copilot/mcp-config.json` to `~/.copilot/`, restart VS Code |
 | `dotnet build` fails | Verify .NET 8 SDK: `dotnet --version` — [download](https://dotnet.microsoft.com/download/dotnet/8.0) |
 | Skills not activating | Reference the skill explicitly in your prompt, or check `SKILL.md` frontmatter |
