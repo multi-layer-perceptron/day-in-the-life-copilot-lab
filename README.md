@@ -504,7 +504,9 @@ git worktree add -b feature/agent-docs ../copilot-worktrees/agent-docs main
 git worktree list
 ```
 
-Start one Copilot CLI session per worktree:
+Start one Copilot CLI session per worktree. Each session stays attached to the terminal where you started it, so keep that terminal open while you start the next session in a new terminal tab, split pane, or window.
+
+**Terminal 1 — implementation session:**
 
 ```bash
 cd ../copilot-worktrees/student-search
@@ -517,7 +519,9 @@ Prompt the first session:
 Act as dotnet-dev. Refactor student search so it supports filtering by last name or first name while preserving pagination and sorting.
 ```
 
-Start a second session:
+Do not exit Terminal 1. Leave the first Copilot CLI session running, then open a second terminal.
+
+**Terminal 2 — testing session:**
 
 ```bash
 cd ../copilot-worktrees/student-search-tests
@@ -530,7 +534,9 @@ Prompt the second session:
 Act as dotnet-qa. Add xUnit and Moq tests for student search behavior. Cover first-name filtering, last-name filtering, combined filters, sorting, and pagination reset.
 ```
 
-Start a third session:
+Do not exit Terminal 2. Leave the testing session running, then open a third terminal.
+
+**Terminal 3 — review session:**
 
 ```bash
 cd ../copilot-worktrees/agent-docs
@@ -542,6 +548,16 @@ Prompt the third session:
 ```text
 Act as code-reviewer. Review the student search changes for bugs, regressions, missing tests, and security issues.
 ```
+
+Your terminals should now look like this:
+
+```text
+Terminal 1 -> /workspaces/copilot-worktrees/student-search       -> feature/student-search
+Terminal 2 -> /workspaces/copilot-worktrees/student-search-tests -> feature/student-search-tests
+Terminal 3 -> /workspaces/copilot-worktrees/agent-docs           -> feature/agent-docs
+```
+
+Only exit a Copilot CLI session when that session's work is complete. Pressing `Ctrl+C`, typing `exit`, or closing the terminal stops that session.
 
 When each branch is ready, validate and commit from its worktree:
 
