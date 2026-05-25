@@ -587,7 +587,19 @@ Clean up merged worktrees when finished:
 
 ```bash
 git worktree remove ../copilot-worktrees/student-search
+git worktree remove ../copilot-worktrees/student-search-tests
+git worktree remove ../copilot-worktrees/agent-docs
+
 git branch -d feature/student-search
+git branch -d feature/student-search-tests
+git branch -d feature/agent-docs
+```
+
+After the integration branch has been merged into your final target branch and all other worktrees and branches have been cleaned up, remove the integration branch too:
+
+```bash
+git switch main
+git branch -d feature/student-search-integration
 ```
 
 This pattern gives you lightweight orchestration with clear branch boundaries: one session can implement, another can test, and another can review or document without competing for the same checkout.
