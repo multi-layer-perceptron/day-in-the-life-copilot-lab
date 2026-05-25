@@ -36,45 +36,62 @@ namespace ContosoUniversity.Web.Controllers
             string? firstNameSearch,
             int? pageNumber)
         {
-            ViewData["CurrentSort"] = sortOrder;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
-
-            if (lastNameSearch != null || firstNameSearch != null)
+            var query = new StudentSearchQuery
             {
-                pageNumber = 1;
-            }
-            else
-            {
-                lastNameSearch = currentLastNameFilter;
-                firstNameSearch = currentFirstNameFilter;
-            }
-
-            ViewData["CurrentLastNameFilter"] = lastNameSearch;
-            ViewData["CurrentFirstNameFilter"] = firstNameSearch;
-
-            var studentsQuery = _studentRepository.GetQueryable();
-
-            if (!String.IsNullOrEmpty(lastNameSearch))
-            {
-                studentsQuery = studentsQuery.Where(s => s.LastName.Contains(lastNameSearch));
-            }
-
-            if (!String.IsNullOrEmpty(firstNameSearch))
-            {
-                studentsQuery = studentsQuery.Where(s => s.FirstMidName.Contains(firstNameSearch));
-            }
-
-            studentsQuery = sortOrder switch
-            {
-                "name_desc" => studentsQuery.OrderByDescending(s => s.LastName),
-                "Date" => studentsQuery.OrderBy(s => s.EnrollmentDate),
-                "date_desc" => studentsQuery.OrderByDescending(s => s.EnrollmentDate),
-                _ => studentsQuery.OrderBy(s => s.LastName),
+                SortOrder = sortOrder,
+                CurrentLastNameFilter = currentLastNameFilter,
+                CurrentFirstNameFilter = currentFirstNameFilter,
+                LastNameSearch = lastNameSearch,
+                FirstNameSearch = firstNameSearch,
+                PageNumber = pageNumber
             };
 
-            int pageSize = 10;
-            return View(await PaginatedList<Student>.CreateAsync(studentsQuery, pageNumber ?? 1, pageSize));
+            PopulateViewData(query);
+
+            var studentsQuery = ApplyFilters(_studentRepository.GetQueryable(), query);
+            studentsQuery = ApplySorting(studentsQuery, query.SortOrder);
+
+            const int pageSize = 10;
+            return View(await PaginatedList<Student>.CreateAsync(
+                studentsQuery, query.EffectivePageNumber, pageSize));
+        }
+
+        private static IQueryable<Student> ApplyFilters(IQueryable<Student> source, StudentSearchQuery query)
+        {
+            var lastNameFilter = query.EffectiveLastNameFilter;
+            var firstNameFilter = query.EffectiveFirstNameFilter;
+
+            if (!string.IsNullOrEmpty(lastNameFilter))
+            {
+                source = source.Where(s => s.LastName.Contains(lastNameFilter));
+            }
+
+            if (!string.IsNullOrEmpty(firstNameFilter))
+            {
+                source = source.Where(s => s.FirstMidName.Contains(firstNameFilter));
+            }
+
+            return source;
+        }
+
+        private static IQueryable<Student> ApplySorting(IQueryable<Student> source, string? sortOrder)
+        {
+            return sortOrder switch
+            {
+                "name_desc" => source.OrderByDescending(s => s.LastName),
+                "Date" => source.OrderBy(s => s.EnrollmentDate),
+                "date_desc" => source.OrderByDescending(s => s.EnrollmentDate),
+                _ => source.OrderBy(s => s.LastName),
+            };
+        }
+
+        private void PopulateViewData(StudentSearchQuery query)
+        {
+            ViewData["CurrentSort"] = query.SortOrder;
+            ViewData["NameSortParm"] = string.IsNullOrEmpty(query.SortOrder) ? "name_desc" : "";
+            ViewData["DateSortParm"] = query.SortOrder == "Date" ? "date_desc" : "Date";
+            ViewData["CurrentLastNameFilter"] = query.EffectiveLastNameFilter;
+            ViewData["CurrentFirstNameFilter"] = query.EffectiveFirstNameFilter;
         }
 
         // GET: Students/Details/5
