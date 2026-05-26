@@ -67,10 +67,10 @@ namespace ContosoUniversity.Tests.Infrastructure
         private static async Task<int> GetMaxEnrollmentAsync(SqliteConnection connection)
         {
             await using var command = connection.CreateCommand();
-            command.CommandText = """
-                SELECT "MaxEnrollment"
-                FROM "Course"
-                WHERE "CourseID" = 1000;
+            command.CommandText = $"""
+                SELECT \"{nameof(Course.MaxEnrollment)}\"
+                FROM \"Course\"
+                WHERE \"CourseID\" = 1000;
                 """;
 
             var result = await command.ExecuteScalarAsync();
