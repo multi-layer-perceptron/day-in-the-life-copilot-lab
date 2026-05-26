@@ -68,9 +68,9 @@ namespace ContosoUniversity.Tests.Infrastructure
         {
             await using var command = connection.CreateCommand();
             command.CommandText = $"""
-                SELECT \"{nameof(Course.MaxEnrollment)}\"
-                FROM \"Course\"
-                WHERE \"CourseID\" = 1000;
+                SELECT "{nameof(Course.MaxEnrollment)}"
+                FROM "Course"
+                WHERE "CourseID" = 1000;
                 """;
 
             var result = await command.ExecuteScalarAsync();
