@@ -81,10 +81,10 @@ namespace ContosoUniversity.Tests.Infrastructure
         private static async Task<bool> MaxEnrollmentColumnExistsAsync(SqliteConnection connection)
         {
             await using var command = connection.CreateCommand();
-            command.CommandText = """
+            command.CommandText = $"""
                 SELECT COUNT(*)
                 FROM pragma_table_info('Course')
-                WHERE name = 'MaxEnrollment';
+                WHERE name = '{nameof(Course.MaxEnrollment)}';
                 """;
 
             var result = await command.ExecuteScalarAsync();
