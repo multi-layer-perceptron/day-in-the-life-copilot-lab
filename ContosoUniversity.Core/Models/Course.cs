@@ -21,6 +21,7 @@ namespace ContosoUniversity.Core.Models
         /// <summary>
         /// Gets or sets the maximum number of students allowed to enroll in the course. Defaults to <see cref="DefaultMaxEnrollment"/>.
         /// </summary>
+        [Range(1, int.MaxValue, ErrorMessage = "Max enrollment must be at least 1.")]
         public int MaxEnrollment { get; set; } = DefaultMaxEnrollment;
 
         public int DepartmentID { get; set; }
