@@ -5,6 +5,8 @@ namespace ContosoUniversity.Core.Models
 {
     public class Course
     {
+        public const int DefaultMaxEnrollment = 30;
+
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Display(Name = "Number")]
         public int CourseID { get; set; }
@@ -15,6 +17,12 @@ namespace ContosoUniversity.Core.Models
 
         [Range(0, 5)]
         public int Credits { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum number of students allowed to enroll in the course. Defaults to <see cref="DefaultMaxEnrollment"/>.
+        /// </summary>
+        [Range(1, int.MaxValue, ErrorMessage = "Max enrollment must be at least 1.")]
+        public int MaxEnrollment { get; set; } = DefaultMaxEnrollment;
 
         public int DepartmentID { get; set; }
 
