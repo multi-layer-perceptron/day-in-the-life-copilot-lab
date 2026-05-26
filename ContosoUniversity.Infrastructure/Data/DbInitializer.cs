@@ -17,7 +17,7 @@ namespace ContosoUniversity.Infrastructure.Data
             try
             {
                 // Ensure the database is created
-                context.Database.EnsureCreated();
+                await context.Database.EnsureCreatedAsync();
                 await EnsureCourseMaxEnrollmentColumnAsync(context, logger);
 
                 // Look for any students - if found, the DB has been seeded
