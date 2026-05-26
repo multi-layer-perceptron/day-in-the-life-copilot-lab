@@ -15,7 +15,7 @@ namespace ContosoUniversity.Tests.Models
             var result = course.MaxEnrollment;
 
             // Assert
-            Assert.Equal(30, result);
+            Assert.Equal(Course.DefaultMaxEnrollment, result);
         }
     }
 }
