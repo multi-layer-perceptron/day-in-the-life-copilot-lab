@@ -439,6 +439,10 @@ erDiagram
 | **ContosoUniversity.Tests** | Testing | xUnit + WebApplicationFactory |
 | **ContosoUniversity.PlaywrightTests** | E2E | Browser-based Playwright tests |
 
+### Recent Feature: Course Max Enrollment
+
+The `Course` model includes a `MaxEnrollment` property (default: 30) that caps student enrollment per course. The `DbInitializer` automatically adds the `MaxEnrollment` column to existing databases on startup, supporting both SQL Server and SQLite providers.
+
 ---
 
 ## What You'll Learn
