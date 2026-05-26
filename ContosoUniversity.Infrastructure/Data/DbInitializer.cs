@@ -1,3 +1,4 @@
+using System.Data;
 using ContosoUniversity.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -6,12 +7,18 @@ namespace ContosoUniversity.Infrastructure.Data
 {
     public static class DbInitializer
     {
+        private const string CourseTableName = "Course";
+        private const string MaxEnrollmentColumnName = nameof(Course.MaxEnrollment);
+        private const string SqlServerProviderName = "Microsoft.EntityFrameworkCore.SqlServer";
+        private const string SqliteProviderName = "Microsoft.EntityFrameworkCore.Sqlite";
+
         public static async Task InitializeAsync(SchoolContext context, ILogger logger)
         {
             try
             {
                 // Ensure the database is created
                 context.Database.EnsureCreated();
+                await EnsureCourseMaxEnrollmentColumnAsync(context, logger);
 
                 // Look for any students - if found, the DB has been seeded
                 if (await context.Students.AnyAsync())
@@ -238,6 +245,84 @@ namespace ContosoUniversity.Infrastructure.Data
             {
                 logger.LogError(ex, "An error occurred while seeding the database");
                 throw;
+            }
+        }
+
+        private static async Task EnsureCourseMaxEnrollmentColumnAsync(SchoolContext context, ILogger logger)
+        {
+            if (!context.Database.IsRelational() || await CourseMaxEnrollmentColumnExistsAsync(context))
+            {
+                return;
+            }
+
+            var sql = context.Database.ProviderName switch
+            {
+                SqlServerProviderName => $"""
+                    ALTER TABLE [{CourseTableName}]
+                    ADD [{MaxEnrollmentColumnName}] int NOT NULL
+                        CONSTRAINT [DF_Course_MaxEnrollment] DEFAULT {Course.DefaultMaxEnrollment};
+                    """,
+                SqliteProviderName => $"""
+                    ALTER TABLE "{CourseTableName}"
+                    ADD COLUMN "{MaxEnrollmentColumnName}" INTEGER NOT NULL DEFAULT {Course.DefaultMaxEnrollment};
+                    """,
+                _ => null
+            };
+
+            if (sql is null)
+            {
+                logger.LogWarning("Skipping Course.MaxEnrollment schema update for provider {provider}", context.Database.ProviderName);
+                return;
+            }
+
+            await context.Database.ExecuteSqlRawAsync(sql);
+        }
+
+        private static async Task<bool> CourseMaxEnrollmentColumnExistsAsync(SchoolContext context)
+        {
+            var sql = context.Database.ProviderName switch
+            {
+                SqlServerProviderName => $"""
+                    SELECT COUNT(*)
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_NAME = '{CourseTableName}'
+                    AND COLUMN_NAME = '{MaxEnrollmentColumnName}';
+                    """,
+                SqliteProviderName => $"""
+                    SELECT COUNT(*)
+                    FROM pragma_table_info('{CourseTableName}')
+                    WHERE name = '{MaxEnrollmentColumnName}';
+                    """,
+                _ => null
+            };
+
+            return sql is not null && await ExecuteScalarCountAsync(context, sql) > 0;
+        }
+
+        private static async Task<int> ExecuteScalarCountAsync(SchoolContext context, string sql)
+        {
+            var connection = context.Database.GetDbConnection();
+            var wasClosed = connection.State == ConnectionState.Closed;
+
+            if (wasClosed)
+            {
+                await connection.OpenAsync();
+            }
+
+            try
+            {
+                await using var command = connection.CreateCommand();
+                command.CommandText = sql;
+                var result = await command.ExecuteScalarAsync();
+
+                return Convert.ToInt32(result);
+            }
+            finally
+            {
+                if (wasClosed)
+                {
+                    await connection.CloseAsync();
+                }
             }
         }
     }

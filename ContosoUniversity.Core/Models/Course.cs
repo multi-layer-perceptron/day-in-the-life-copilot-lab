@@ -5,7 +5,7 @@ namespace ContosoUniversity.Core.Models
 {
     public class Course
     {
-        private const int DefaultMaxEnrollment = 30;
+        public const int DefaultMaxEnrollment = 30;
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Display(Name = "Number")]
