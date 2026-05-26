@@ -19,7 +19,7 @@ namespace ContosoUniversity.Core.Models
         public int Credits { get; set; }
 
         /// <summary>
-        /// Gets or sets the maximum number of students allowed to enroll in the course.
+        /// Gets or sets the maximum number of students allowed to enroll in the course. Defaults to 30.
         /// </summary>
         public int MaxEnrollment { get; set; } = DefaultMaxEnrollment;
 
